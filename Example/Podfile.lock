@@ -1,0 +1,27 @@
+PODS:
+  - FBSnapshotTestCase (2.1.4):
+    - FBSnapshotTestCase/SwiftSupport (= 2.1.4)
+  - FBSnapshotTestCase/Core (2.1.4)
+  - FBSnapshotTestCase/SwiftSupport (2.1.4):
+    - FBSnapshotTestCase/Core
+  - MVDPlayerSDK (0.1.0)
+
+DEPENDENCIES:
+  - FBSnapshotTestCase
+  - MVDPlayerSDK (from `../`)
+
+SPEC REPOS:
+  trunk:
+    - FBSnapshotTestCase
+
+EXTERNAL SOURCES:
+  MVDPlayerSDK:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
+  MVDPlayerSDK: 1040c9fed4e537e6857673465ec5b8370d16782d
+
+PODFILE CHECKSUM: fe48854c54df369de052559c941d99edf248c7dc
+
+COCOAPODS: 1.12.1

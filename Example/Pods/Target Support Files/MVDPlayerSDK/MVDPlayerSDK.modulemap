@@ -1,0 +1,6 @@
+framework module MVDPlayerSDK {
+  umbrella header "MVDPlayerSDK-umbrella.h"
+
+  export *
+  module * { export * }
+}
