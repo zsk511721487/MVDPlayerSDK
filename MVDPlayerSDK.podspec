@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'MVDPlayerSDK'
-  s.version          = '0.1.1'
+  s.version          = '0.1.2'
   s.summary          = 'A short description of MVDPlayerSDK.'
 
 # This description is used to generate tags and improve search results.
@@ -30,7 +30,7 @@ TODO: Add long description of the pod here.
 
   s.platform     = :ios#支持平台
 
-  s.ios.deployment_target = '15.0'
+  s.ios.deployment_target = '13.0'
   
   s.ios.vendored_frameworks = "MVDPlayerSDK/frameworks/MVDPlayer.framework"
   
