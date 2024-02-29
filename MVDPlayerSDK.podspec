@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'MVDPlayerSDK'
-  s.version          = '0.1.0'
+  s.version          = '0.1.1'
   s.summary          = 'A short description of MVDPlayerSDK.'
 
 # This description is used to generate tags and improve search results.
@@ -28,15 +28,17 @@ TODO: Add long description of the pod here.
   s.source           = { :git => 'https://github.com/zsk511721487/MVDPlayerSDK.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
+  s.platform     = :ios#支持平台
+
   s.ios.deployment_target = '15.0'
   
-  s.vendored_frameworks = "MVDPlayerSDK/frameworks/MVDPlayer.framework"
+  s.ios.vendored_frameworks = "MVDPlayerSDK/frameworks/MVDPlayer.framework"
   
-  s.frameworks = "AVFoundation", "UIKit"
+#  s.frameworks = "AVFoundation", "CoreAudio", "CoreGraphics","CoreMedia", "CoreVideo", "Metal", "Security","UIKit", "VideoToolbox"
   
-  # s.resource_bundles = {
-  #   'MVDPlayerSDK' => ['MVDPlayerSDK/Assets/*.png']
-  # }
+#   s.resource_bundles = {
+#     'MVDPlayerSDK' => ["MVDPlayerSDK/frameworks/MVDPlayer.framework"]
+#   }
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'

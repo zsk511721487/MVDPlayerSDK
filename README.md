@@ -9,6 +9,11 @@
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
+- pod lib lint --skip-import-validation --allow-warnings
+- pod spec lint --skip-import-validation --allow-warnings
+- pod repo push BrainMedSpec MVDPlayerSDK.podspec --skip-import-validation --allow-warnings
+上传更新仓库
+
 ## Requirements
 
 ## Installation

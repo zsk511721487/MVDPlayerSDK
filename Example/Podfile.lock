@@ -8,20 +8,18 @@ PODS:
 
 DEPENDENCIES:
   - FBSnapshotTestCase
-  - MVDPlayerSDK (from `../`)
+  - MVDPlayerSDK
 
 SPEC REPOS:
+  https://github.com/zsk511721487/BrainMedSpec.git:
+    - MVDPlayerSDK
   trunk:
     - FBSnapshotTestCase
 
-EXTERNAL SOURCES:
-  MVDPlayerSDK:
-    :path: "../"
-
 SPEC CHECKSUMS:
   FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
-  MVDPlayerSDK: 1040c9fed4e537e6857673465ec5b8370d16782d
+  MVDPlayerSDK: 29e3322d2d038ce0c1b388d32b3431eac7762ff1
 
-PODFILE CHECKSUM: fe48854c54df369de052559c941d99edf248c7dc
+PODFILE CHECKSUM: a393def2e8621ae53d52b77c59b44115f112d3be
 
 COCOAPODS: 1.12.1
