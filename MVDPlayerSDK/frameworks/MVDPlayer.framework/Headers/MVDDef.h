@@ -58,6 +58,8 @@ typedef enum MVDPlayerError : NSUInteger {
     MVDPlayerErrorResume,
     /**@brief 云台操作失败*/
     MVDPlayerErrorPTZ,
+    /**@brief 回放屏更新时间失败*/
+    MVDPlayerErrorPlayBackUpdateTime,
     
 } MVDPlayerError;
 

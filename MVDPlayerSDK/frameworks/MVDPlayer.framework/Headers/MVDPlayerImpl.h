@@ -165,12 +165,20 @@ typedef NS_ENUM(int, EPixelType){
  */
 @property (nonatomic, weak) id<MVDPlayerDelegate> delegate;
 
+- (instancetype)initWithStream:(int)streamtype;
+
 /**
  @brief 实时信号连接
  @param deviceId 设备id
  @param channel 通道数
  */
 - (void)connectWithDeviceId:(int)deviceId channel: (int)channel;
+
+/**
+ @brief 切换码流
+ @param type 0 为主码流 1 为副码流
+ */
+- (void)switchStreamType:(int)type;
 
 /**
  @brief 回放信号连接
@@ -277,6 +285,15 @@ typedef NS_ENUM(int, EPixelType){
   */
 - (void)startRecordVideo;
 - (void)stopRecordVideo;
+
+/**
+ @brief 获取回放屏当前播放的日期
+  */
+- (uint32_t)getPlaybackStreamOsdtime;
+/**
+ @brief 获取回放屏当前播放的时长
+  */
+- (int)getPlaybackStreamPlayingtime;
 
 /**
 * Get the resolution of a video source with the specific channel type.
@@ -1247,6 +1264,44 @@ typedef NS_ENUM(int, EPixelType){
 */
 -(void)  mvdCloseEtouchControl:(void*)hDevice;
 
+/**
+* record a video stream with a specified duration
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param tid         the video stream id of realtime/playback video stream.
+* @param filename      pointer to the name of a file to save the vidoe stream
+* @param duration   duration in second to record.
+*                   The beginning of the duration is from the function returned in success.
+*                   This duration is video time but not the system clock time.
+*
+* @return
+*    > 0 : started in success
+*    = 0 : there is already an on-going recording.
+*          in this case, mvd_close_stream_record() can be called to close/reset the recording state.
+*    < 0 : failed to start
+*
+* @remarks
+*    1) the id must be a realtime/playback video stream
+*    2£©the duration is in video time*
+*/
+-(int) mvdStartStreamRecord:(void*)hDevice tid:(uint64_t)tid filename:(NSString*)filename duration:(int)duration;
+
+/**
+* close a video stream recording.
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+ * @param tid         the video stream id on which called start_stream_record() successfully
+* @param cancel     flag indicate to cancel the on-going recording if the recording is still not completed
+*
+* return
+*    > 0 : the recording is completed in success
+*    = 0 : if cancel is true, the recording is cancelled and maybe the length is less than required duratoin;
+*          if cancel is false, the recording is not completed and is on-going
+*    < 0 : failed to close on error
+*/
+-(int) mvdCloseStreamRecord:(void*)hDevice tid:(uint64_t)tid cancel:(bool)cancel;
+
 
 @end
-
