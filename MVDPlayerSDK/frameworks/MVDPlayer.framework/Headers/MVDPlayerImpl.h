@@ -150,6 +150,13 @@ typedef NS_ENUM(int, EPixelType){
  */
 - (void)onVideoSizeChanged:(MVDPlayer*)player width:(int)width height:(int)height;
 
+/**
+ @brief 视频清晰度变化回调
+ @param player 播放器player指针
+ @param quality 清晰度 0： 高清， 1：标清
+ */
+- (void)onVideoQualityChanged:(MVDPlayer*)player quality:(int)quality;
+
 @end
 
 @interface MVDPlayer : NSObject
