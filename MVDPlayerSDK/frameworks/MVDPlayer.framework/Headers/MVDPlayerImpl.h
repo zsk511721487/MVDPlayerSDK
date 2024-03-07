@@ -178,8 +178,9 @@ typedef NS_ENUM(int, EPixelType){
  @brief 实时信号连接
  @param deviceId 设备id
  @param channel 通道数
+ @param channelType 摄像头类型
  */
-- (void)connectWithDeviceId:(int)deviceId channel: (int)channel;
+- (void)connectWithDeviceId:(int)deviceId channel: (int)channel channelType:(int)channelType;
 
 /**
  @brief 切换码流
@@ -192,8 +193,9 @@ typedef NS_ENUM(int, EPixelType){
  @param deviceId 设备id
  @param channel 通道数
  @param starttime 开始时间
+ @param channelType 摄像头类型
  */
-- (void)connectPlayBackWithDeviceId:(int)deviceId channel: (int)channel starttime:(uint32_t)starttime;
+- (void)connectPlayBackWithDeviceId:(int)deviceId channel: (int)channel starttime:(uint32_t)starttime channelType:(int)channelType;
 
 /**
  @brief 关闭信号连接
