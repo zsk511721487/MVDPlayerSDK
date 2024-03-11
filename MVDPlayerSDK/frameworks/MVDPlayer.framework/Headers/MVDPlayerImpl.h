@@ -293,6 +293,12 @@ typedef NS_ENUM(int, EPixelType){
  @see 图片会在回调方法 <onPlayerSnpshotCurrentFrame: videoPath:>
   */
 - (void)startRecordVideo;
+
+/**
+ @brief 录制视频
+ @see 图片会在回调方法 <onPlayerSnpshotCurrentFrame: videoPath:>
+ 如果时间小于3秒回收到 onPlayerRecordVideoDurationTooShort 回调，并不会停止录制。
+  */
 - (void)stopRecordVideo;
 
 /**
