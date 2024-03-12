@@ -8,6 +8,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <MVDPlayer/MVDDef.h>
+#import <MVDPlayer/MVDRabbitmqModel.h>
 
 typedef NS_ENUM(int, EPTZControlType){
     EOCPTZStop       = 0,   //stop PTZ moving
@@ -179,8 +180,9 @@ typedef NS_ENUM(int, EPixelType){
  @param deviceId 设备id
  @param channel 通道数
  @param channelType 摄像头类型
+ @param rabbitmq 服务器配置
  */
-- (void)connectWithDeviceId:(int)deviceId channel: (int)channel channelType:(int)channelType;
+- (void)connectWithDeviceId:(int)deviceId channel: (int)channel channelType:(int)channelType rabbitmq:(MVDRabbitmqModel *)rabbitmq;
 
 /**
  @brief 切换码流
@@ -194,8 +196,9 @@ typedef NS_ENUM(int, EPixelType){
  @param channel 通道数
  @param starttime 开始时间
  @param channelType 摄像头类型
+ @param rabbitmq 服务器配置
  */
-- (void)connectPlayBackWithDeviceId:(int)deviceId channel: (int)channel starttime:(uint32_t)starttime channelType:(int)channelType;
+- (void)connectPlayBackWithDeviceId:(int)deviceId channel: (int)channel starttime:(uint32_t)starttime channelType:(int)channelType rabbitmq:(MVDRabbitmqModel *)rabbitmq;
 
 /**
  @brief 关闭信号连接
