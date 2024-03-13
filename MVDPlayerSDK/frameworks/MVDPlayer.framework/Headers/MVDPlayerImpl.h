@@ -1292,6 +1292,8 @@ typedef NS_ENUM(int, EPixelType){
 * @param duration   duration in second to record.
 *                   The beginning of the duration is from the function returned in success.
 *                   This duration is video time but not the system clock time.
+* @param width,height require width and height in pixel for target video picture.
+*                     either -1 means to record in the stream original width and height
 *
 * @return
 *    > 0 : started in success
@@ -1303,7 +1305,20 @@ typedef NS_ENUM(int, EPixelType){
 *    1) the id must be a realtime/playback video stream
 *    2£©the duration is in video time*
 */
--(int) mvdStartStreamRecord:(void*)hDevice tid:(uint64_t)tid filename:(NSString*)filename duration:(int)duration;
+-(int) mvdStartStreamRecord:(void*)hDevice tid:(uint64_t)tid filename:(NSString*)filename duration:(int)duration width:(int)width heigth:(int)height;
+
+/**
+* get/query the recorded duration of the stream after mvd_start_stream_record() called in success.
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param id         the video stream id of realtime/playback video stream.
+*
+* @return
+*    >= 0 : recorded duration in second
+*    < 0 :  failed
+*/
+-(int) mvdGetStreamRecordedDuration:(void*)hDevice tid:(uint64_t)tid;
 
 /**
 * close a video stream recording.
