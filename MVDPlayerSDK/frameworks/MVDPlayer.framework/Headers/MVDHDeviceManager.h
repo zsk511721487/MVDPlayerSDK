@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void*)getHDevice:(int)deviceId rabbitmq:(MVDRabbitmqModel *)rabbitmq queue:(dispatch_queue_t)queue;
 
 /// 关闭信号
-- (void)close:(int)deviceId rabbitmq:(MVDRabbitmqModel *)rabbitmq;
+- (void)close:(int)deviceId rabbitmq:(MVDRabbitmqModel *)rabbitmq streamId:(int)streamId;
 
 - (void)closeAll;
 @end
