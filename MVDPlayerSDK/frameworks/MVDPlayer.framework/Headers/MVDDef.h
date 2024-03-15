@@ -16,6 +16,8 @@
 
 /**@brief 播放器事件类型*/
 typedef enum MVDEventType: NSUInteger {
+    /**@brief 设备空闲中*/
+    MVDEventFree,
     /**@brief 链接设备中*/
     MVDEventConnecting,
     /**@brief 链接设备成功*/
