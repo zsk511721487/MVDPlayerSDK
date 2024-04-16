@@ -1186,6 +1186,8 @@ typedef NS_ENUM(int, EPixelType){
 * @param hDevice    Handle to a connected MVD device which was returned by
 *                   mvd_create_device().
 * @param channel    reserved in this version, must be 0.
+* @param width, height in pixel. The real screen resolution of the remote computer to control
+*                      can be -1 means keep the resolution set before.
 *
 * @return
 *    >  0 :  started in succes and can call mvd_send_etouch_keyboard_event()/
@@ -1195,7 +1197,7 @@ typedef NS_ENUM(int, EPixelType){
 *            or E-Touch device controlled by other user now.
 *    <  0 :  failed to started on system error
 */
--(int)  mvdStartEtouchControl:(void*)hDevice channel:(int)channel;
+-(int)  mvdStartEtouchControl:(void*)hDevice channel:(int)channel width:(int)width height:(int)height;
 
 /**
 * send a keyboard event to the E-Touch which is installde the MVD device.
@@ -1278,9 +1280,42 @@ typedef NS_ENUM(int, EPixelType){
 -(int)  mvdSendEtouchMouseEvent:(void*)hDevice event:(int)event dx:(int)dx dy:(int)dy;
 
 /**
+* send a mouse absolute position to the E-Touch which is installde the MVD device.
+*
+* @param hDevice         Handle to a connected MVD device which was returned by
+*                        mvd_create_device().
+* @param width, height   Absolution position in pixel
+* @param keys            The states mouse keys defined as below:
+*                             bit0 : mouse left key pressed or not. 1 for pressed
+*                              bit1 : mouse right key pressed or not. 1 for pressed
+*                          bit2 : mouse middle key pressed or not. 1 for pressed
+*                          bit3~7: reserved, must be 0
+*
+* @return
+*    >  0 :  send the position sucessfully.
+*    =  0 :  The position is not supported, or
+*            the E-Touch control is not opened for this user.
+*    <  0 :  failed to send on system error
+*
+* Remarks:
+*   Only after mvd_start_etouch_control() called in success, and then
+*   mvd_send_etouch_mouse_position() can be called.
+*/
+-(int)  mvdSendEtouchMousePosition:(void*)hDevice x:(uint16_t)x y:(uint16_t)y keys:(uint8_t)keys;
+
+/**
 * request to stop E-Touch remote control.
 */
 -(void)  mvdCloseEtouchControl:(void*)hDevice;
+
+/**
+* Helper API to speed up the release of some global resources, such as threads, memory,... to
+* let the application exit as quick as possible.
+*
+* This function is only for some application or some scenario which need to quick exit and it can be called
+* just before the whole program to exist. It is optional to call this API before the program exit.
+*/
+-(void) mvdCloseAllToExit;
 
 /**
 * record a video stream with a specified duration
