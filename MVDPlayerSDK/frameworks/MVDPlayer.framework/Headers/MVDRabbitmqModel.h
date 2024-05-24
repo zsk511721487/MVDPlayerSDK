@@ -29,7 +29,15 @@ NS_ASSUME_NONNULL_BEGIN
 /// 虚拟host名称
 @property (nonatomic, copy) NSString *vhost;
 
+/// 设备id
+@property (nonatomic, assign) int deviceId;
+
+/// 通道id
+@property (nonatomic, assign) int channelId;
+
 - (NSString *)getRabbitmqKeyWith:(int)deviceId;
+
+- (NSString *)getRabbitmqStreamIdKeyWith;
 
 @end
 
