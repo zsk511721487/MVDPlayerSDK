@@ -20,6 +20,13 @@ NS_ASSUME_NONNULL_BEGIN
 ///   - deviceId 设备id
 - (void*)getHDevice:(int)deviceId rabbitmq:(MVDRabbitmqModel *)rabbitmq ;
 
+
+/// 创建设备
+/// - Parameters:
+///   - deviceId: 设备id
+///   - rabbitmq: 通道数据
+- (void)createHDevice:(int)deviceId rabbitmq:(MVDRabbitmqModel *)rabbitmq;
+
 /// 关闭信号
 - (void)close:(int)deviceId rabbitmq:(MVDRabbitmqModel *)rabbitmq streamId:(int)streamId;
 
