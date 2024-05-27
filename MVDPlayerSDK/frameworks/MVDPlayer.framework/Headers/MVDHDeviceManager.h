@@ -50,6 +50,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)openAllRealPlay:(NSArray<MVDRabbitmqModel *>*)rabbitmqs;
 
 
+/// 移除某个信号
+/// - Parameters:
+///   - deviceId: 设备id
+///   - channelId: 通道id
+- (void)deleteStreamIdWith:(UInt32)deviceId channelId:(UInt32)channelId;
 
 - (void)closeAll;
 
