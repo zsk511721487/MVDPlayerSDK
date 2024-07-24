@@ -533,7 +533,7 @@ typedef NS_ENUM(int, EPixelType){
 *   2) If started successfully, repeatedly call mvd_get_talking_data_play() to get
 *      audio data from device to play
 */
-- (int)mvdOpenTalking:(void*)hDevice audioChannels:(int*)audioChannels audioSamplerate:(int*)audioSamplerate audioSamplebits:(int*)audioSamplebits localInputDeviceName:(NSString *)localInputDeviceName;
+- (int)mvdOpenTalking:(void*)hDevice audioChannels:(int*)audioChannels audioSamplerate:(int*)audioSamplerate audioSamplebits:(int*)audioSamplebits inputAudioFormatName:(NSString *)inputAudioFormatName inputAudioDeviceName:(NSString *)inputAudioDeviceName;
 
 /**
 * send PCM audio frames to the MVD device.
