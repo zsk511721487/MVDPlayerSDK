@@ -1197,7 +1197,7 @@ typedef NS_ENUM(int, EPixelType){
 *            or E-Touch device controlled by other user now.
 *    <  0 :  failed to started on system error
 */
--(int)  mvdStartEtouchControl:(void*)hDevice channel:(int)channel width:(int)width height:(int)height;
+-(int)  mvdStartEtouchControlWidth:(int)width height:(int)height;
 
 /**
 * send a keyboard event to the E-Touch which is installde the MVD device.
@@ -1234,7 +1234,7 @@ typedef NS_ENUM(int, EPixelType){
 *   Only after mvd_start_etouch_control() called in success, and then
 *   mvd_send_etouch_keyboard_event() can be called.
 */
--(int)  mvdSendEtouchKeyboardEvent:(void*)hDevice events:(int)events keyvalue:(int)keyvalue;
+-(int)  mvdSendEtouchKeyboardEvent:(int)events keyvalue:(int)keyvalue;
 
 
 /**
@@ -1277,7 +1277,7 @@ typedef NS_ENUM(int, EPixelType){
 *   Only after mvd_start_etouch_control() called in success, and then
 *   mvd_send_etouch_mouse_event() can be called.
 */
--(int)  mvdSendEtouchMouseEvent:(void*)hDevice event:(int)event dx:(int)dx dy:(int)dy;
+-(int)  mvdSendEtouchMouseEvent:(int)event dx:(int)dx dy:(int)dy;
 
 /**
 * send a mouse absolute position to the E-Touch which is installde the MVD device.
@@ -1301,12 +1301,12 @@ typedef NS_ENUM(int, EPixelType){
 *   Only after mvd_start_etouch_control() called in success, and then
 *   mvd_send_etouch_mouse_position() can be called.
 */
--(int)  mvdSendEtouchMousePosition:(void*)hDevice x:(uint16_t)x y:(uint16_t)y keys:(uint8_t)keys;
+-(int)  mvdSendEtouchMousePositionX:(uint16_t)x y:(uint16_t)y keys:(uint8_t)keys;
 
 /**
 * request to stop E-Touch remote control.
 */
--(void)  mvdCloseEtouchControl:(void*)hDevice;
+-(void)  mvdCloseEtouchControl;
 
 /**
 * Helper API to speed up the release of some global resources, such as threads, memory,... to
