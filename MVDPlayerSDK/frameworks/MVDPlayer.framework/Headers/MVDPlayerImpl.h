@@ -316,7 +316,7 @@ typedef NS_ENUM(int, EPixelType){
 /**
  @brief 获取当前视频的 size
   */
-- (CGSize)getVideoSize;
+- (CGSize)getCurrentVideoSize;
 
 /**
 * Get the resolution of a video source with the specific channel type.
