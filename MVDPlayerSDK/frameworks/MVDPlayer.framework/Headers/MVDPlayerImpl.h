@@ -314,6 +314,11 @@ typedef NS_ENUM(int, EPixelType){
 - (int)getPlaybackStreamPlayingtime;
 
 /**
+ @brief 获取当前视频的 size
+  */
+- (CGSize)getVideoSize;
+
+/**
 * Get the resolution of a video source with the specific channel type.
 *
 * @param video_channel_type  type of the video channel
