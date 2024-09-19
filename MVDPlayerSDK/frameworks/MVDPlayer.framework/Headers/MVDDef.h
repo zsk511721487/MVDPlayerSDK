@@ -44,6 +44,8 @@ typedef enum MVDPlayerError : NSUInteger {
     MVDPlayerErrorRealPlayConnect,
     /**@brief 实时视频开启对讲失败*/
     MVDPlayerErrorRealPlayOpenTalking,
+    /**@brief 实时视频开启对讲链接失败*/
+    MVDPlayerErrorRealPlayLinkTalking,
     /**@brief 回放视频链接失败*/
     MVDPlayerErrorPlayBackConnect,
     /**@brief 回放视频设置倍速失败*/

@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'MVDPlayerSDK'
-  s.version          = '0.1.54'
+  s.version          = '0.1.55'
   s.summary          = 'A short description of MVDPlayerSDK.'
 
 # This description is used to generate tags and improve search results.
