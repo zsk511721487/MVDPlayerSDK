@@ -13,6 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MVDHDeviceManager : NSObject
 
+@property (nonatomic, strong) NSLock *deviceLock;
+
 + (instancetype)shared;
 
 /// 获取HDeivce
