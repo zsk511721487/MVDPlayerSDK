@@ -14,6 +14,8 @@
 #import <UIKit/UIKit.h>
 #endif
 
+#define MVDPlayerLog(format, ...) NSLog((@"[Line %d] " format), __LINE__, ##__VA_ARGS__)
+
 /**@brief 播放器事件类型*/
 typedef enum MVDEventType: NSUInteger {
     /**@brief 设备空闲中*/
