@@ -540,6 +540,21 @@ typedef NS_ENUM(int, EPixelType){
 */
 - (int)mvdOpenTalking:(void*)hDevice audioChannels:(int*)audioChannels audioSamplerate:(int*)audioSamplerate audioSamplebits:(int*)audioSamplebits inputAudioFormatName:(NSString *)inputAudioFormatName inputAudioDeviceName:(NSString *)inputAudioDeviceName;
 
+- (int)mvdOpenTalking2:(void*)hDevice userId:(uint32_t[10])userId audioChannels:(int*)audioChannels audioSamplerate:(int*)audioSamplerate audioSamplebits:(int*)audioSamplebits inputAudioFormatName:(NSString *)inputAudioFormatName inputAudioDeviceName:(NSString *)inputAudioDeviceName;
+
+/**
+* Query the users who are talking together now via this device.
+*
+* @param hDevice   Handle to a connected MVD device which was returned by
+*                  mvd_create_device().
+* @param userid     Buffer to retrieve all the id of the user who are talking together now via this device.
+*                   It also includes the id of this user himself if he/she are in the device's talking now.
+* @return
+*   >= 0 : the number of user id retrieved in the provided buffer, userid.
+*   <  0 : failed to query
+*/
+- (int)  mvdQueryTalkers:(void*)hDevice userId:(uint32_t[10])userId;
+
 /**
 * send PCM audio frames to the MVD device.
 *
