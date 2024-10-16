@@ -18,8 +18,15 @@ NS_ASSUME_NONNULL_BEGIN
 /// 获取HDeivce
 /// - Parameters:
 ///   - deviceId 设备id
-- (void*)getHDevice:(int)deviceId rabbitmq:(MVDRabbitmqModel *)rabbitmq ;
+- (void*)getHDevice:(int)deviceId rabbitmq:(MVDRabbitmqModel *)rabbitmq;
 
+
+/// 获取HDeivce
+/// - Parameters:
+///   - deviceId: 设备 id
+///   - rabbitmq: 创建所需要的参数
+///   - completion: 成功获取的回调
+- (void)getHDeviceForDeviceId:(int)deviceId rabbitmq:(MVDRabbitmqModel *)rabbitmq completion:(void (^)(void*))completion;
 
 /// 创建设备
 /// - Parameters:
