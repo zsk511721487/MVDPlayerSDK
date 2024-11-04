@@ -15,4 +15,7 @@ FOUNDATION_EXPORT const unsigned char MVDPlayerSDKVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <MVDPlayerSDK/PublicHeader.h>
 
-#import <MVDPlayerSDK/MVDPlayerImpl.h>
+#import <MVDPlayer/MVDPlayerImpl.h>
+#import <MVDPlayer/MVDHDeviceManager.h>
+#import <MVDPlayer/MVDPlayerVideo.h>
+#import <MVDPlayer/MVDPlayerVideoCanvas.h>

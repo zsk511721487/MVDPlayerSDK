@@ -37,8 +37,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)getRabbitmqKeyWith:(int)deviceId;
 
-- (NSString *)getRabbitmqStreamIdKeyWith;
-
 @end
 
 NS_ASSUME_NONNULL_END

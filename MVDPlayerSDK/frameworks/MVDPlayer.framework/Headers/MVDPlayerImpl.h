@@ -80,6 +80,13 @@ typedef NS_ENUM(int, EPixelType){
  @param player 播放器player指针
  */
 - (void)onResume:(MVDPlayer*)player;
+
+/**
+ @brief 对讲 VOLC 功能开启
+ @param player 播放器player指针
+ */
+- (void)onPlayerTalkingOpened:(MVDPlayer* )player appId:(NSString *)appId roomId:(NSString*)roomId token:(NSString*)token;
+
 /**
  @brief 对讲功能开启
  @param player 播放器player指针
@@ -160,6 +167,7 @@ typedef NS_ENUM(int, EPixelType){
 
 @end
 
+@class MVDPlayerVideoCanvas;
 @interface MVDPlayer : NSObject
 
 /**
@@ -172,6 +180,8 @@ typedef NS_ENUM(int, EPixelType){
  @see MVDPlayerDelegate
  */
 @property (nonatomic, weak) id<MVDPlayerDelegate> delegate;
+
+- (instancetype)initWithConfig:(MVDRabbitmqModel *)config withCanvas:(MVDPlayerVideoCanvas *)canvas;
 
 - (instancetype)initWithStream:(int)streamtype;
 
@@ -189,6 +199,11 @@ typedef NS_ENUM(int, EPixelType){
  @param type 0 为主码流 1 为副码流
  */
 - (void)switchStreamType:(int)type;
+
+/**
+ @brief 播放前准备
+ */
+- (void)prepare;
 
 /**
  @brief 回放信号连接
@@ -248,6 +263,12 @@ typedef NS_ENUM(int, EPixelType){
  */
 - (void)setPlayBackSpeed:(int)speedIndex;
 
+/**
+ @brief 开启 Volc 对讲功能
+ 
+ 成功或失败会收到 MVDPlayerDelegate 的回调
+ */
+- (void)openVolcTalkingWith:(NSString*)userId;
 /**
  @brief 开启对讲功能
  
@@ -541,6 +562,40 @@ typedef NS_ENUM(int, EPixelType){
 - (int)mvdOpenTalking:(void*)hDevice audioChannels:(int*)audioChannels audioSamplerate:(int*)audioSamplerate audioSamplebits:(int*)audioSamplebits inputAudioFormatName:(NSString *)inputAudioFormatName inputAudioDeviceName:(NSString *)inputAudioDeviceName;
 
 - (int)mvdOpenTalking2:(void*)hDevice userId:(uint32_t[10])userId audioChannels:(int*)audioChannels audioSamplerate:(int*)audioSamplerate audioSamplebits:(int*)audioSamplebits inputAudioFormatName:(NSString *)inputAudioFormatName inputAudioDeviceName:(NSString *)inputAudioDeviceName;
+
+/**
+* Open talking with the MVD device via Volc online meeting.
+* Call this function to request the device to create a Volc meeting room and joint the meeting, then return
+* the necessary infomation of the meeting to let the caller join it.
+*
+* Based on the meeting information,  the caller join/leave/monitors the meeting by Volc engine API as a general
+* Volc online meeting application. During the meeting, the audio data is sent/received and played by Volc engine
+* automatically and no other API of this SDK needs to invoke, except mvd_talking_opened() can be called to determine
+* whether the caller is already in a mvd talking.
+*
+* Please follow the below steps to close/leave the meeting:
+*    1) call Volc Engine API to leave the meeting room
+*    2) call mvd_close_talking() to let MVD device peer that you left the talking£¨this is important!
+*
+* @param hDevice           Handle to a connected MVD device which was returned by
+* @param userid            ID/name to identify this user to join the talking in Volc meeting room.
+*                          The length of this userid string must be less than 64!!
+* @param audio_channels    buffer to retrieve the PCM audio channels supported by the device
+* @param audio_samplerate  buffer to retrieve the PCM audio sample rate, namely samples per second
+* @param audio_samplebits  buffer to retrieve then PCM audio sampe bits, namely bits per sample.
+* @param volc_appid        buffer to retrieve the appid of Volc Engine
+* @param volc_roomid       buffer to retrieve the id of meeting room
+* @param volc_token        buffer to retrieve the token for this user to enter Volc meeting room
+
+*
+* @remarks:
+*   1) In Volc talking, these regular talking APIs: mvd_send_audio_frame(), mvd_start_talking(), mvd_start_talking(), mvd_pause_talking() and mvd_get_talking_data_play()
+* are unnecessary to be called and they are not useful for a Volc meetimhg/talking.
+*   2) The Volc Talking, atcually it is a Volc meeting and the device join the meeting with fixed userid 'LINKTD'
+*   3) Only these 2 API are necessary for a Volc talking: mvd_open_volc_talking() and mvd_close_talking(), and
+*   4) These 2 API can be called optionally during the meeting/talking as desired:  mvd_query_talkers() and optional mvd_talking_opened()
+*/
+-(int)mvdOpenVolcTalking:(void*)hDevice userId:(NSString *)userId audioChannels:(int*)audioChannels audioSamplerate:(int*)audioSamplerate audioSamplebits:(int*)audioSamplebits volcAppid:(char*)volcAppid volcRoomid:(char*)volcRoomid volcToken:(char*)volcToken;
 
 /**
 * Query the users who are talking together now via this device.
