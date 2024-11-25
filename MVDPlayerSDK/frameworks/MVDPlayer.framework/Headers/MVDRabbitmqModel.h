@@ -35,6 +35,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// 通道id
 @property (nonatomic, assign) int channelId;
 
+/// 视频水印是否开启
+@property (nonatomic, assign) bool watermark;
+
 - (NSString *)getRabbitmqKeyWith:(int)deviceId;
 
 @end

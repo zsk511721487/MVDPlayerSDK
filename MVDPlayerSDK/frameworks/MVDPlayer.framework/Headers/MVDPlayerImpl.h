@@ -397,7 +397,8 @@ typedef NS_ENUM(int, EPixelType){
 *    Non-NULL: The hanndle to the device
 *
 */
-- (void*)mvdCreateDevice: (uint32_t)clientid deviceid:(uint32_t)deviceid mqhost:(NSString *)mqhost mqport:(int)mqport mqvhost:(NSString *)mqvhost mquser:(NSString *)mquser mqpassword:(NSString *)mqpassword;
+- (void*)mvdCreateDevice: (uint32_t)clientid deviceid:(uint32_t)deviceid mqhost:(NSString *)mqhost mqport:(int)mqport mqvhost:(NSString *)mqvhost mquser:(NSString *)mquser mqpassword:(NSString *)mqpassword waterprintfname:(NSString*)waterprintfname waterprintframe:(void*)waterprintframe;
+
 /**
 * Destroy a MVD device if no longer need to use it.
 * Please don't use the handle after it destroyed!
@@ -1391,6 +1392,25 @@ typedef NS_ENUM(int, EPixelType){
 * just before the whole program to exist. It is optional to call this API before the program exit.
 */
 -(void) mvdCloseAllToExit;
+
+/**
+* Show/hide the waterprint for a spearate realplay or playback vide stream
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param id         the video stream id of realtime video stream/playback video stream.
+* @param show       flag indicate to show or hide. true : show;  false : hide
+*
+*
+* @remarks
+*    1) video will show waterprint by default when the mvd device created with a valid waterprint file provide.
+*    2) call this mvd_show_stream_waterprint() to show/hide the waterprint
+*    3) if no valid waterprint file provided to create the mvd device, the waterprint will not be displayed even if
+*       call this function with true flag.
+*
+*/
+-(void) mvdShowStreamWaterprint:(void*)hDevice tid:(uint64_t)tid show:(bool)show;
+
 
 /**
 * record a video stream with a specified duration
