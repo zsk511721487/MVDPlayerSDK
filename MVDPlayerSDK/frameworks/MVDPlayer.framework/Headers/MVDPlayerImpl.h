@@ -340,6 +340,40 @@ typedef NS_ENUM(int, EPixelType){
 - (CGSize)getCurrentVideoSize;
 
 /**
+ @brief 设置涂鸦展示状态
+ @param isEnableDraw false： 只能展示 true： 既展示又可以绘制
+  */
+- (void)setIsEnableDraw:(BOOL)isEnableDraw;
+
+/**
+ @brief 设置线宽
+ @param width width of the pen in pixel
+  */
+- (void)setPenWidth:(int32_t)width;
+
+/**
+ @brief 设置画笔颜色
+ @param color RGB color of the pen.  the color scheme:  0x00bbggrr
+  */
+- (void)setPenColor:(uint32_t)color;
+
+/**
+ @brief 设置绘画形状
+ @param cmd  0:nothing 1:draw a line segment  2:draw a polyline  3:draw a circle/ellipse  4:draw an arrow  5: draw a rectangle
+  */
+- (void)setDrawCmd:(int)cmd;
+
+/**
+ @brief 撤销上一步涂鸦
+  */
+- (void)undoGraffiti;
+
+/**
+ @brief 清空涂鸦
+  */
+- (void)clearGradditi;
+
+/**
 * Get the resolution of a video source with the specific channel type.
 *
 * @param video_channel_type  type of the video channel

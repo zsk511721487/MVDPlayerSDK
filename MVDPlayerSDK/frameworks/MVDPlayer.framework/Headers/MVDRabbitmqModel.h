@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MVDRabbitmqModel : NSObject
 
-/// 服务器ip地址
+/// 用户id
 @property (nonatomic, assign) int clientid;
 
 /// 服务器ip地址

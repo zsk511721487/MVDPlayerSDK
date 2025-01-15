@@ -19,3 +19,4 @@ FOUNDATION_EXPORT const unsigned char MVDPlayerSDKVersionString[];
 #import <MVDPlayer/MVDHDeviceManager.h>
 #import <MVDPlayer/MVDPlayerVideo.h>
 #import <MVDPlayer/MVDPlayerVideoCanvas.h>
+#import <MVDPlayer/MVDDrawerManager.h>
