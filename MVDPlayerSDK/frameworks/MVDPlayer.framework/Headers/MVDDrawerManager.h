@@ -17,6 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, assign) BOOL isOpen; // 是否开启绘制
 
+@property (nonatomic, assign) int32_t currentDeviceId; // 当前正在涂鸦的设备id
+
 @property (nonatomic, strong) NSMutableDictionary<NSString*, NSNumber*> *referenceCounts;
 
 + (instancetype)shared;
@@ -31,11 +33,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setDrawCmd:(int)cmd;
 
 // 配置设备和通道
-- (BOOL)configureWithclientId:(int32_t)clientId;
+- (BOOL)configureWithclientId:(int32_t)clientId
+              currentDeviceId:(int32_t)currentDeviceId;
 
 // 开启 Scribbler
 - (BOOL)openScribblerWidth:(void*)device
-                  deviceId:(int32_t)deviceId
                    channel:(int)channel;
 
 // 发布形状
@@ -48,7 +50,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 // 关闭 Scribbler
 - (void)closeScribblerWidth:(void*)device
-                   deviceId:(int32_t)deviceId
                     channel:(int)channel;
 
 // 释放所有资源
