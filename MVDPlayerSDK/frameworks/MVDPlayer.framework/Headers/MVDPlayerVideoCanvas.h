@@ -19,6 +19,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * @locale zh
+ * @brief 当前视频的唯一id
+ */
+@property(copy, nonatomic) NSString *reuseIdentifier;
+
+/**
+ * @locale zh
  * @brief 视频模式 0实时 1回放
  */
 @property(assign, nonatomic) int playType;
@@ -28,6 +34,12 @@ NS_ASSUME_NONNULL_BEGIN
  * @brief 清晰度 0 是高清， 1 是标清
  */
 @property(assign, nonatomic) int channelType;
+
+/**
+ * @locale zh
+ * @brief 设备类型 根据设备类型获取视频的原始宽高
+ */
+@property(assign, nonatomic) int videoChannelType;
 @end
 
 NS_ASSUME_NONNULL_END
