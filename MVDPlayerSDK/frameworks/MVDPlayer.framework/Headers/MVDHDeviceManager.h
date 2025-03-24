@@ -24,6 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
              buzid:(NSString *)buzid
   closeOtherTaling:(BOOL)closeOtherTaling;
 
+- (void)closeTalking;
+
 /// 获取HDeivce
 /// - Parameters:
 ///   - deviceId 设备id
