@@ -633,6 +633,37 @@ typedef NS_ENUM(int, EPixelType){
 -(int)mvdOpenVolcTalking:(void*)hDevice userId:(NSString *)userId audioChannels:(int*)audioChannels audioSamplerate:(int*)audioSamplerate audioSamplebits:(int*)audioSamplebits volcAppid:(char*)volcAppid volcRoomid:(char*)volcRoomid volcToken:(char*)volcToken;
 
 /**
+* Let MVD device join the specific Volc RTC meeting room.
+* Call this function to request the device to join a Volc meeting room. If necessary, require the device
+* leave/quit other talking.
+*
+* Based on the meeting information,  the caller join/leave/monitors the meeting by Volc engine API as a general
+* Volc online meeting application. During the meeting, the audio data is sent/received and played by Volc engine
+* automatically and no other API of this SDK needs to invoke, except mvd_talking_opened() can be called to determine
+* whether the caller is already in a mvd talking.
+*
+* Please follow the below steps to close/leave the meeting:
+*    1) call Volc Engine API to leave the meeting room
+*    2) call mvd_close_talking() to let MVD device peer that you left the talking£¨this is important!
+*
+* @param hDevice              Handle to a connected MVD device which was returned by
+* @param volc_roomid          The id of Volc meeting room which was already created!!
+* @param volc_buzid           The ID of Volc businnessID
+* @param close_other_taling   Flag indciating the device to close other talking if it is.  If this flag
+*                             is false, the function will return 0 and the device will be still in the current talking.
+*
+*
+* @remarks:
+*   1) In Volc talking, these regular talking APIs: mvd_send_audio_frame(), mvd_start_talking(), mvd_start_talking(), mvd_pause_talking() and mvd_get_talking_data_play()
+* are unnecessary to be called and they are not useful for a Volc meetimhg/talking.
+*   2) The Volc Talking, atcually it is a Volc meeting and the device join the meeting with fixed userid 'LINKTD'
+*   3) Only these 2 API are necessary for a Volc talking: mvd_join_volc_talking() and mvd_close_talking(), and
+*   4) These 2 API can be called optionally during the meeting/talking as desired:  mvd_query_talkers() and optional mvd_talking_opened()
+*/
+-(int)  mvdJoinVolcTalking:(void*)hDevice roomId:(NSString *)roomId buzId:(NSString *)buzId closeOtherTaling:(bool)closeOtherTaling;
+
+
+/**
 * Query the users who are talking together now via this device.
 *
 * @param hDevice   Handle to a connected MVD device which was returned by

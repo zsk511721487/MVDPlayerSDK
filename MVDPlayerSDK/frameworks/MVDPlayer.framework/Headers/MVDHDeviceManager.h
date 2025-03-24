@@ -15,6 +15,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)shared;
 
+/// 开启对讲，目前只有会诊需要
+///  - Parameters:
+///   - volcRoomId: 会议的 room id
+///   - buzid: Volc businnessID
+///   - closeOtherTaling: 是否关闭其他对讲
+- (int)openTalking:(NSString *)volcRoomId
+             buzid:(NSString *)buzid
+  closeOtherTaling:(BOOL)closeOtherTaling;
+
 /// 获取HDeivce
 /// - Parameters:
 ///   - deviceId 设备id
