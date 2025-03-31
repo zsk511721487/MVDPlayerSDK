@@ -17,14 +17,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// 开启对讲，目前只有会诊需要
 ///  - Parameters:
+///   - clientid:客户端标识符，目前使用的是用户id
 ///   - volcRoomId: 会议的 room id
 ///   - buzid: Volc businnessID
 ///   - closeOtherTaling: 是否关闭其他对讲
-- (int)openTalking:(NSString *)volcRoomId
+- (int)openTalking:(int)clientid
+          deviceid:(uint32_t)deviceid
+        volcRoomId:(NSString *)volcRoomId
              buzid:(NSString *)buzid
   closeOtherTaling:(BOOL)closeOtherTaling;
 
-- (void)closeTalking;
+- (void)closeTalking:(uint32_t)deviceid;
 
 /// 获取HDeivce
 /// - Parameters:

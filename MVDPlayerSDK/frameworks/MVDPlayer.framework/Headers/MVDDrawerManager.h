@@ -36,6 +36,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)configureWithclientId:(int32_t)clientId
               currentDeviceId:(int32_t)currentDeviceId;
 
+- (void)destory;
+
 // 开启 Scribbler
 - (BOOL)openScribblerWidth:(void*)device
                    channel:(int)channel;
