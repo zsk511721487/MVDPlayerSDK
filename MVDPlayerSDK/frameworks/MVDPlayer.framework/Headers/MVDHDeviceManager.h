@@ -21,12 +21,11 @@ NS_ASSUME_NONNULL_BEGIN
 ///   - volcRoomId: 会议的 room id
 ///   - buzid: Volc businnessID
 ///   - closeOtherTaling: 是否关闭其他对讲
-- (void)openTalking:(int)clientid
+- (BOOL)openTalking:(int)clientid
           deviceid:(uint32_t)deviceid
         volcRoomId:(NSString *)volcRoomId
              buzid:(NSString *)buzid
-  closeOtherTaling:(BOOL)closeOtherTaling
-        completion:(void (^)(int))completion;
+  closeOtherTaling:(BOOL)closeOtherTaling;
 
 - (void)closeTalking:(uint32_t)deviceid;
 
