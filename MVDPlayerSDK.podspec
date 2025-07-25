@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'MVDPlayerSDK'
-  s.version          = '2.0.0'
+  s.version          = '2.0.1'
   s.summary          = 'A short description of MVDPlayerSDK.'
 
 # This description is used to generate tags and improve search results.
@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-  MVDPlayerSDK
+  MVDPlayerSDK 2.0.1
                        DESC
 
   s.homepage         = 'https://github.com/zsk511721487/MVDPlayerSDK'
