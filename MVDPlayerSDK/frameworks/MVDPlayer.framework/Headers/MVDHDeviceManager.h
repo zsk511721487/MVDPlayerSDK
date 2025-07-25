@@ -13,6 +13,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MVDHDeviceManager : NSObject
 
+// 设备自动销毁控制
+@property (nonatomic, assign) BOOL autoDestroyEnabled;
+
 + (instancetype)shared;
 
 /// 开启对讲，目前只有会诊需要
@@ -29,18 +32,26 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)closeTalking:(uint32_t)deviceid;
 
-/// 获取HDeivce
+/// 异步获取HDevice - 专业版本
+/// - Parameters:
+///   - deviceId: 设备id
+///   - rabbitmq: rabbitmq配置
+///   - completion: 异步回调，在后台队列中执行
+- (void)getHDeviceForDeviceId:(int)deviceId 
+                     rabbitmq:(MVDRabbitmqModel *)rabbitmq 
+                   completion:(void(^)(void * _Nonnull device))completion;
+
+/// 释放HDevice引用 - 专业版本
+/// - Parameters:
+///   - deviceId: 设备id
+///   - rabbitmq: rabbitmq配置
+- (void)releaseHDeviceForDeviceId:(int)deviceId rabbitmq:(MVDRabbitmqModel *)rabbitmq;
+
+/// 获取HDeivce - 已废弃，请使用异步版本
 /// - Parameters:
 ///   - deviceId 设备id
-- (void*)getHDevice:(int)deviceId rabbitmq:(MVDRabbitmqModel *)rabbitmq;
+- (void*)getHDevice:(int)deviceId rabbitmq:(MVDRabbitmqModel *)rabbitmq __deprecated_msg("Use getHDeviceForDeviceId:rabbitmq:completion: instead");
 
-
-/// 获取HDeivce
-/// - Parameters:
-///   - deviceId: 设备 id
-///   - rabbitmq: 创建所需要的参数
-///   - completion: 成功获取的回调
-- (void)getHDeviceForDeviceId:(int)deviceId rabbitmq:(MVDRabbitmqModel *)rabbitmq completion:(void (^)(void*))completion;
 
 /// 创建设备
 /// - Parameters:
