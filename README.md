@@ -5,62 +5,78 @@
 [![License](https://img.shields.io/cocoapods/l/MVDPlayerSDK.svg?style=flat)](https://cocoapods.org/pods/MVDPlayerSDK)
 [![Platform](https://img.shields.io/cocoapods/p/MVDPlayerSDK.svg?style=flat)](https://cocoapods.org/pods/MVDPlayerSDK)
 
-MVDPlayerSDK is a comprehensive iOS SDK for medical video device streaming and playback. It provides real-time video streaming, historical playback, PTZ camera control, voice communication, and remote device control capabilities specifically designed for medical applications.
+## 开发命令
 
-## Features
+```bash
+# 本地验证podspec
+pod lib lint --skip-import-validation --allow-warnings
 
-- **Real-time Video Streaming**: Live video streaming from medical devices with low latency
-- **Historical Playback**: Time-based video playback with seek and speed control
-- **Multi-channel Support**: Handle multiple devices and channels simultaneously
-- **PTZ Camera Control**: Pan-tilt-zoom operations for camera positioning
-- **Voice Communication**: Two-way audio communication with devices
-- **Remote Control**: Keyboard and mouse control of connected medical devices
-- **Video Recording**: Built-in screenshot and video recording capabilities
-- **Drawing Overlay**: Annotation and markup tools on video streams
-- **Volc Integration**: Online meeting capabilities for remote collaboration
-- **Download Support**: Save video segments to local storage
+# 远程验证podspec
+pod spec lint --skip-import-validation --allow-warnings
 
-## Requirements
+# 发布到私有spec仓库
+pod repo push BrainMedSpec MVDPlayerSDK.podspec --skip-import-validation --allow-warnings
+
+# 更新仓库
+上传更新仓库
+```
+
+MVDPlayerSDK 是一个专业的iOS医疗视频设备流媒体SDK。提供实时视频流、历史回放、PTZ摄像机控制、语音通信和远程设备控制功能，专为医疗应用设计。
+
+## 功能特性
+
+- **实时视频流**: 从医疗设备进行低延迟实时视频流传输
+- **历史回放**: 基于时间的视频回放，支持拖拽和速度控制
+- **多通道支持**: 同时处理多个设备和通道
+- **PTZ摄像机控制**: 摄像机云台全方位控制（上下左右、变焦）
+- **语音通信**: 与设备的双向音频通信
+- **远程控制**: 通过键盘鼠标远程控制连接的医疗设备
+- **视频录制**: 内置截图和视频录制功能
+- **绘图标注**: 在视频流上添加注释和标记工具
+- **Volc集成**: 在线会议功能，支持远程协作
+- **下载支持**: 将视频片段保存到本地存储
+
+## 环境要求
 
 - iOS 13.0+
 - Xcode 12.0+
-- Swift 5.0+ or Objective-C
-- CocoaPods for dependency management
+- Swift 5.0+ 或 Objective-C
+- CocoaPods 依赖管理
 
-## Installation
+## 安装
 
-MVDPlayerSDK is available through [CocoaPods](https://cocoapods.org). To install it, simply add the following line to your Podfile:
+MVDPlayerSDK 通过 [CocoaPods](https://cocoapods.org) 提供安装。在你的 Podfile 中添加以下行：
 
 ```ruby
 pod 'MVDPlayerSDK'
 ```
 
-For projects using private spec repositories, ensure you have the BrainMedSpec repository configured:
+对于使用私有spec仓库的项目，确保已配置 BrainMedSpec 仓库：
 
 ```ruby
 source 'https://cdn.cocoapods.org/'
 source 'https://github.com/zsk511721487/BrainMedSpec.git'
 ```
 
-Then run:
+然后运行：
 
 ```bash
 pod install
 ```
 
-## Quick Start
+## 快速开始
 
-### Basic Setup
+### 基础设置
 
 ```objective-c
 #import <MVDPlayerSDK/MVDPlayerSDK.h>
 
-// Initialize player
+// 初始化播放器
 MVDPlayer *player = [[MVDPlayer alloc] initWithStream:0];
 player.preView = self.videoView;
 player.delegate = self;
 
-// Configure RabbitMQ connection
+// 配置RabbitMQ连接
 MVDRabbitmqModel *config = [[MVDRabbitmqModel alloc] init];
 config.host = @"your-rabbitmq-host";
 config.port = 5672;
@@ -68,104 +84,103 @@ config.vhost = @"/";
 config.user = @"username";
 config.password = @"password";
 
-// Connect to device
+// 连接设备
 [player connectWithDeviceId:12345 channel:1 channelType:0 rabbitmq:config];
 ```
 
-### Real-time Streaming
+### 实时流媒体
 
 ```objective-c
-// Start real-time streaming
+// 开始实时流媒体
 [player prepare];
 
-// PTZ control examples
-[player controlPTZ:EOCPTZUp reserved:0];     // Move camera up
-[player controlPTZ:EOCPTZZoomIn reserved:0]; // Zoom in
-[player controlPTZ:EOCPTZStop reserved:0];   // Stop movement
+// PTZ控制示例
+[player controlPTZ:EOCPTZUp reserved:0];     // 摄像机向上移动
+[player controlPTZ:EOCPTZZoomIn reserved:0]; // 变焦放大
+[player controlPTZ:EOCPTZStop reserved:0];   // 停止移动
 ```
 
-### Playback Streaming
+### 回放流媒体
 
 ```objective-c
-// Start playback from specific time
-uint32_t startTime = [[NSDate date] timeIntervalSince1970] - 3600; // 1 hour ago
+// 从指定时间开始回放
+uint32_t startTime = [[NSDate date] timeIntervalSince1970] - 3600; // 1小时前
 [player connectPlayBackWithDeviceId:12345 channel:1 starttime:startTime channelType:0 rabbitmq:config];
 
-// Control playback speed
-[player setPlayBackSpeed:1]; // 2x speed
-[player setPlayBackSpeed:0]; // Normal speed
-[player setPlayBackSpeed:-1]; // 0.5x speed
+// 控制播放速度
+[player setPlayBackSpeed:1];  // 2倍速
+[player setPlayBackSpeed:0];  // 正常速度
+[player setPlayBackSpeed:-1]; // 0.5倍速
 ```
 
-### Voice Communication
+### 语音通信
 
 ```objective-c
-// Open voice communication
+// 开启语音通信
 [player openTalking];
 
-// Or use Volc integration for online meetings
+// 或使用Volc集成进行在线会议
 [player openVolcTalkingWith:@"user-id"];
 ```
 
-### Recording and Capture
+### 录制和截图
 
 ```objective-c
-// Take screenshot
+// 截图
 [player cuptureImage];
 
-// Start video recording
+// 开始录制视频
 [player startRecordVideo];
 
-// Stop recording
+// 停止录制
 [player stopRecordVideo];
 ```
 
-### Drawing and Annotation
+### 绘图标注
 
 ```objective-c
-// Enable drawing
+// 启用绘图
 [player setIsEnableDraw:YES];
 [player setPenWidth:3];
-[player setPenColor:0xFF0000]; // Red color
-[player setDrawCmd:1]; // Line segment
+[player setPenColor:0xFF0000]; // 红色
+[player setDrawCmd:1]; // 线段
 
-// Drawing operations
-[player undoGraffiti]; // Undo last action
-[player clearGradditi]; // Clear all drawings
-```
+// 绘图操作
+[player undoGraffiti];  // 撤销上一步
+[player clearGradditi]; // 清除所有绘图
 
-## API Reference
+## API参考
 
-### Core Classes
+### 核心类
 
 #### MVDPlayer
 
-Main player class for device connection and video streaming.
+主播放器类，用于设备连接和视频流媒体。
 
-**Properties:**
-- `preView` - UIView for video display
-- `delegate` - Delegate for event callbacks
+**属性:**
+- `preView` - 用于视频显示的UIView
+- `delegate` - 事件回调代理
 
-**Key Methods:**
-- `connectWithDeviceId:channel:channelType:rabbitmq:` - Connect to device for real-time streaming
-- `connectPlayBackWithDeviceId:channel:starttime:channelType:rabbitmq:` - Connect for playback streaming
-- `switchStreamType:` - Switch between primary/secondary streams
-- `controlPTZ:reserved:` - PTZ camera control
-- `openTalking` / `closeTalking` - Voice communication
-- `startRecordVideo` / `stopRecordVideo` - Video recording
-- `cuptureImage` - Screenshot capture
+**关键方法:**
+- `connectWithDeviceId:channel:channelType:rabbitmq:` - 连接设备进行实时流媒体
+- `connectPlayBackWithDeviceId:channel:starttime:channelType:rabbitmq:` - 连接设备进行回放流媒体
+- `switchStreamType:` - 切换主码流/副码流
+- `controlPTZ:reserved:` - PTZ摄像机控制
+- `openTalking` / `closeTalking` - 语音通信控制
+- `startRecordVideo` / `stopRecordVideo` - 视频录制
+- `cuptureImage` - 截图功能
 
 #### MVDPlayerVideoCanvas
 
-Video rendering canvas for advanced video display and interaction.
+高级视频渲染画布，用于视频显示和交互。
 
 #### MVDHDeviceManager
 
-Device management utilities for device discovery and configuration.
+设备管理工具，用于设备发现和配置。
 
-### Delegates
+### 代理协议
 
-Implement `MVDPlayerDelegate` to receive callbacks:
+实现 `MVDPlayerDelegate` 接收回调：
 
 ```objective-c
 @protocol MVDPlayerDelegate <NSObject>
@@ -178,26 +193,26 @@ Implement `MVDPlayerDelegate` to receive callbacks:
 @end
 ```
 
-### Advanced Features
+### 高级功能
 
-#### Remote Device Control (E-Touch)
+#### 远程设备控制 (E-Touch)
 
 ```objective-c
-// Start remote control
+// 启动远程控制
 [player mvdStartEtouchControlWidth:1920 height:1080];
 
-// Send keyboard events
-[player mvdSendEtouchKeyboardEvent:0x01 keyvalue:0x20]; // 'A' key press
+// 发送键盘事件
+[player mvdSendEtouchKeyboardEvent:0x01 keyvalue:0x20]; // 按下'A'键
 
-// Send mouse events
-[player mvdSendEtouchMouseEvent:0 dx:10 dy:10]; // Mouse move
-[player mvdSendEtouchMouseEvent:2 dx:0 dy:0];   // Left click
+// 发送鼠标事件
+[player mvdSendEtouchMouseEvent:0 dx:10 dy:10]; // 鼠标移动
+[player mvdSendEtouchMouseEvent:2 dx:0 dy:0];   // 左键点击
 ```
 
-#### Video Download
+#### 视频下载
 
 ```objective-c
-// Download video segment
+// 下载视频片段
 uint64_t downloadId = [player mvdStartDwonloadStream:@"save_path.mp4" 
                                            channel:1 
                                        starttime:startTime 
@@ -205,17 +220,17 @@ uint64_t downloadId = [player mvdStartDwonloadStream:@"save_path.mp4"
                                          bitrate:2048 
                                             concat:YES];
 
-// Check progress
+// 检查进度
 int progress = [player mvdGetDownloadStreamProgress:downloadId];
 ```
 
-#### Playback Groups
+#### 回放组管理
 
 ```objective-c
-// Create playback group for synchronized multi-channel playback
+// 创建回放组用于同步多通道回放
 void* groupHandle = [player mvdCreatePlaybackGroup];
 
-// Add streams to group
+// 添加流到组
 [player mvdAddPlaybackGroupStream:groupHandle 
                           channel:1 
                             width:&width 
@@ -224,41 +239,25 @@ void* groupHandle = [player mvdCreatePlaybackGroup];
                         starttime:startTime 
                           endtime:endTime];
 
-// Control entire group
+// 控制整个组
 [player mvdStartPlaybackGroup:groupHandle];
 [player mvdPausePlaybackGroup:groupHandle];
-[player mvdSetPlaybackGroupSpeed:groupHandle speedIndex:1]; // 2x speed
+[player mvdSetPlaybackGroupSpeed:groupHandle speedIndex:1]; // 2倍速
 ```
 
-## Example
+## 示例项目
 
-To run the example project:
+运行示例项目：
 
-1. Clone the repository
-2. Navigate to the Example directory: `cd Example`
-3. Install dependencies: `pod install`
-4. Open the workspace: `open MVDPlayerSDK.xcworkspace`
-5. Build and run the example app
+1. 克隆仓库
+2. 进入Example目录: `cd Example`
+3. 安装依赖: `pod install`
+4. 打开工作空间: `open MVDPlayerSDK.xcworkspace`
+5. 构建并运行示例应用
 
-## Development Commands
+## 配置示例
 
-```bash
-# Validate podspec locally
-pod lib lint --skip-import-validation --allow-warnings
-
-# Validate podspec remotely
-pod spec lint --skip-import-validation --allow-warnings
-
-# Publish to private spec repository
-pod repo push BrainMedSpec MVDPlayerSDK.podspec --skip-import-validation --allow-warnings
-
-# Update repository
-上传更新仓库
-```
-
-## Configuration Examples
-
-### RabbitMQ Configuration
+### RabbitMQ配置
 
 ```objective-c
 MVDRabbitmqModel *config = [[MVDRabbitmqModel alloc] init];
@@ -269,10 +268,10 @@ config.user = @"username";
 config.password = @"password";
 ```
 
-### Volc Integration Setup
+### Volc集成设置
 
 ```objective-c
-// Get Volc meeting credentials
+// 获取Volc会议凭证
 char appId[64], roomId[64], token[256];
 int audioChannels, audioSamplerate, audioSamplebits;
 
@@ -285,40 +284,40 @@ int result = [player mvdOpenVolcTalking:userId
                              volcToken:token];
 ```
 
-## Troubleshooting
+## 故障排除
 
-### Common Issues
+### 常见问题
 
-1. **Connection Failed**: Check RabbitMQ configuration and network connectivity
-2. **No Video Display**: Verify device ID, channel number, and permissions
-3. **Audio Issues**: Ensure microphone permissions are granted
-4. **Recording Failed**: Check storage permissions and available space
+1. **连接失败**: 检查RabbitMQ配置和网络连接
+2. **无视频显示**: 验证设备ID、通道号和权限
+3. **音频问题**: 确保麦克风权限已授予
+4. **录制失败**: 检查存储权限和可用空间
 
-### Debug Logging
+### 调试日志
 
 ```objective-c
-// Enable debug logging
+// 启用调试日志
 [player mvdOpenLog:@"debug.log"];
 
-// Disable logging
+// 禁用日志
 [player mvdCloseLog];
 ```
 
-## Requirements
+## 环境要求
 
-- iOS 13.0 or later
-- Xcode 12.0 or later
-- Physical device recommended for testing (simulator has limitations)
-- Network connectivity for device communication
+- iOS 13.0 或更高版本
+- Xcode 12.0 或更高版本
+- 建议使用真机测试（模拟器有限制）
+- 网络连接用于设备通信
 
-## License
+## 许可证
 
-MVDPlayerSDK is available under the MIT license. See the LICENSE file for more info.
+MVDPlayerSDK 基于MIT许可证提供。详情请参见LICENSE文件。
 
-## Author
+## 作者
 
 511721487@qq.com, 511721487@qq.com
 
-## Support
+## 技术支持
 
-For technical support and questions, please contact the development team or refer to the example project implementation.
+如需技术支持和问题咨询，请联系开发团队或参考示例项目实现。
