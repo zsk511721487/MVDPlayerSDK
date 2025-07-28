@@ -97,15 +97,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)closeAll;
 
-/// 流程控制相关方法
-/// 检查是否启用了标准流程控制
-- (BOOL)isStandardFlowEnabled;
-
-/// 检查是否已完成openAllRealPlay步骤
-- (BOOL)hasCompletedOpenAllRealPlay;
-
-/// 重置流程控制状态（用于特殊情况）
-- (void)resetFlowControlState;
 
 @end
 
