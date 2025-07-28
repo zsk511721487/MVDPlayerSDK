@@ -53,11 +53,18 @@ NS_ASSUME_NONNULL_BEGIN
 - (void*)getHDevice:(int)deviceId rabbitmq:(MVDRabbitmqModel *)rabbitmq __deprecated_msg("Use getHDeviceForDeviceId:rabbitmq:completion: instead");
 
 
-/// 创建设备
+/// 同步创建单个HDevice（保持兼容性）
 /// - Parameters:
 ///   - deviceId: 设备id
 ///   - rabbitmq: 通道数据
 - (void)createHDevice:(int)deviceId rabbitmq:(MVDRabbitmqModel *)rabbitmq;
+
+/// 批量创建多个HDevice - 推荐使用
+/// - Parameters:
+///   - rabbitmqs: 设备配置数组
+///   - completion: 完成回调 - allSuccess: 是否全部成功, failedKeys: 失败的设备key数组
+- (void)createMultipleHDevices:(NSArray<MVDRabbitmqModel *> *)rabbitmqs 
+                    completion:(void(^)(BOOL allSuccess, NSArray<NSString *> *failedKeys))completion;
 
 /// 关闭信号
 - (void)close:(int)deviceId rabbitmq:(MVDRabbitmqModel *)rabbitmq streamId:(int)streamId;
