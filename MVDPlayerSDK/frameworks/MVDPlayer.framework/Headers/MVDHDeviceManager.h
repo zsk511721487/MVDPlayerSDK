@@ -66,6 +66,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)createMultipleHDevices:(NSArray<MVDRabbitmqModel *> *)rabbitmqs 
                     completion:(void(^)(BOOL allSuccess, NSArray<NSString *> *failedKeys))completion;
 
+/// 同步批量创建多个HDevice - 会阻塞调用线程
+/// - Parameters:
+///   - rabbitmqs: 设备配置数组
+///   - failedKeys: 失败的设备key数组(输出参数)
+/// - Returns: 是否全部创建成功
+- (BOOL)createMultipleHDevicesSync:(NSArray<MVDRabbitmqModel *> *)rabbitmqs 
+                        failedKeys:(NSArray<NSString *> **)failedKeys;
+
 /// 关闭信号
 - (void)close:(int)deviceId rabbitmq:(MVDRabbitmqModel *)rabbitmq streamId:(int)streamId;
 
