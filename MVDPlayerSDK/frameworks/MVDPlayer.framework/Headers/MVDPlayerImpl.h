@@ -383,6 +383,912 @@ typedef NS_ENUM(int, EPixelType){
 - (void)mvdCloseLog;
 
 //////////////////////////////////////////////////////////////////////////////
+//                       API for device management                          //
+//////////////////////////////////////////////////////////////////////////////
+
+/**
+* Create a MVD device and build the connection with it.
+* A handle to a MVD device is the basis of all other API
+* to pull different streams.
+*
+* @param deviceid   id of the MVD device to connect.
+* @param clientid   id of the user(client)
+* @param mqhost     RabbitMQ server IP address or name
+* @param mqport     RabbitMQ server TCP port
+* @param mqvhost    RabbitMQ server virtual host name
+* @param mquser     RabbitMQ server user name to login
+* @param mqpassword RabbitMQ server password to login
+*
+* @return
+*    NULL :    failed to connect with device
+*    Non-NULL: The hanndle to the device
+*
+*/
+- (void*)mvdCreateDevice: (uint32_t)clientid deviceid:(uint32_t)deviceid mqhost:(NSString *)mqhost mqport:(int)mqport mqvhost:(NSString *)mqvhost mquser:(NSString *)mquser mqpassword:(NSString *)mqpassword waterprintfname:(NSString*)waterprintfname waterprintframe:(void*)waterprintframe;
+
+/**
+* Destroy a MVD device if no longer need to use it.
+* Please don't use the handle after it destroyed!
+*
+* @param hDevice   handle to the MVD device to destroy.
+*                 this handle is returned by mvd_create_device().
+*/
+- (void)mvdDestroyDevice: (void*)hDevice;
+
+//////////////////////////////////////////////////////////////////////////////
+//                       API for realtime video stream                      //
+//////////////////////////////////////////////////////////////////////////////
+
+/**
+* open a stream to pull the realtime video frames from a channel of the MVD device
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param width      buffer to retrieve the width in pixel of the video stream if
+*                   the function create the stream in success.
+* @param height     buffer to retrieve the height in pixel of the video stream if
+*                   the function create the stream in success.
+* @param fps        buffer to retrieve the framerate of the video stream if
+*                   the function create the stream in success.
+* @param channel    the number of the channel from which to pull video stream
+* @param streamtype stream type, must be 0 in this version.
+*
+* @return
+*    The id of the stream if opened in success, otherwise return INVALID_STREAMID on error.
+*
+*/
+- (uint64_t)mvdOpenRealPlayStream:(void*)hDevice width:(int*)width height:(int*)height fps:(float*)fps channel:(int)channel streamtype:(int)streamtype;
+
+/**
+* stop/close a realtime video stream of a device
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param tid         id the a realtime video stream return by mvd_open_realplay_stream().
+
+*
+* @remarks
+*    1) Don't use this id after it closed.
+*    2) Be sure the stream belongs to this device, don't close a stream against
+*       the handle to another device.
+*    3) the id MUST BE returned by mvd_open_realplay_stream()! Please
+*      don't call this API to close a stream with the id returned by other functions!
+*
+*/
+- (void)mvdCloseRealPlayStream: (void*)hDevice tid:(uint64_t)tid;
+
+/**
+* stop/close all realtime video stream(s) of the specified device
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+*
+* @remarks
+*    after called mvd_close_all_realplay_stream() to close all the realtime video stream,
+*    mvd_open_realplay_stream() can be called again to open new stream(s) to play.
+*
+*/
+- (void)mvdCloseAllRealPlayStream: (void*)hDevice;
+
+/**
+* Control the PTZ of the camera(channel) to move as required movement
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param tid         the realtime video stream id returned by mvd_open_realplay_stream()
+*                   of the specified MVD device.
+* @param cmd        the required movement to control the PTZ.
+*                   EPTZStop and EPTZReset are the two special command to stop/reset
+*                   current moving
+* @param reserved   must be 0 in this version
+*
+* @return
+*    > 0 : control the PTZ to move in success
+*    = 0 : the specified channel does't support PTZ
+*    < 0 : Failed to control on some error
+*
+* @remarks
+*    1) the id must be a realtime video stream returned by mvd_open_realplay_stream()!
+*    2) the id must macthes its device
+*    3) Except EPTZStop & EPTZReset, the PTZ will move continously after controlled in success.
+*
+*/
+- (int)mvdControlPTZ: (void*)hDevice tid:(uint64_t)tid cmd:(EPTZControlType)cmd reserved:(int)reserved;
+
+/**
+* ask for a new frame of a realtime video stream or playback video stream to display.
+* NULL frame will be returned if so far no frame recieved from the stream.
+*
+* The function will alway returned the last frame If the stream finished or stopped/paused
+* to push video after a while and at least one frame received
+*
+* After got a frame by calling this function, must display this frame immediately.
+* The returned value is the duration in second to keep the gotten frame displayed and then
+* to call this function again to get new frame to refresh display.
+*
+* This function must be called repeatedly in a separate thread for each stream channel or
+* at least in a thread to call this function for each stream channel
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param tid         the realtime video stream id of realtime video stream/playback video stream.
+* @param frame buffer to retrieve the pointer to the frame data in required format or NULL
+*                   if no frame yet.
+* @param lineSize  buffer to retrieve a positive or negative value, which is typically indicating
+*                   the size in bytes of each picture line, but it can also be the negative byte size of
+*                   lines for vertical flipping
+* @param width      required width in pixel of the returned frame
+* @param height     required height in pixel of the returned frame
+* @param fmt        required pixel format of the returned frame
+* @param align      required line align of the returned frame data, for example, if required RGB/RGBA for BMP
+*                   pixel format, align must be 4 in windows platform to display
+*
+* @return
+*    The duration in second for this frame to keep displayed
+*
+* @remarks
+*    1) the id must be a realtime or playback video stream
+
+*
+*/
+- (double)mvdGetFrameDisplay:(void*)hDevice tid:(uint64_t)tid frame:(const void**)frame  lineSize:(int *)lineSize width:(int)width height:(int)height fmt:(EPixelType)fmt align:(int)align;
+
+//////////////////////////////////////////////////////////////////////////////
+//                       API for talking                                    //
+//////////////////////////////////////////////////////////////////////////////
+
+/**
+* Open the voice tunnel with the device to exchange PCM audio frames/data.
+*
+*
+* @param hDevice           Handle to a connected MVD device which was returned by
+*                          mvd_create_device().
+* @param audioChannels    buffer to retrieve the PCM audio channels supported by the device
+* @param audioSamplerate  buffer to retrieve the PCM audio sample rate, namely samples per second
+* @param audioSamplebits  buffer to retrieve then PCM audio sampe bits, namely bits per sample.
+* @param localInputDeviceName  The name of local microphone to capture audio data to send to the MVD device.
+*                                 This name can be:
+*                                    - "dshow" on windows platform;
+*                                    - "fbdev" or "v4l2" on linux, and
+*                                    - "avfoundation" on MAC.
+*                                 It can be NULL or "" not to open the local microphone to capture audio,
+*                                 in this case the application can call mvd_send_audio_frame() API to send
+*                                 PCM audio data to the device on demand.
+*
+*
+* @return
+*    > 0 : opened in success.
+*    = 0:  the device is alread in talking with other client or yourself
+*    < 0:  Failed to open on system error
+*
+* @remarks:
+*   1) If started successfully, call begin_talking()/pause_talking() to control
+*      start(resume) and puase the talking
+*   2) If started successfully, repeatedly call mvd_get_talking_data_play() to get
+*      audio data from device to play
+*/
+- (int)mvdOpenTalking:(void*)hDevice audioChannels:(int*)audioChannels audioSamplerate:(int*)audioSamplerate audioSamplebits:(int*)audioSamplebits inputAudioFormatName:(NSString *)inputAudioFormatName inputAudioDeviceName:(NSString *)inputAudioDeviceName;
+
+- (int)mvdOpenTalking2:(void*)hDevice userId:(uint32_t[10])userId audioChannels:(int*)audioChannels audioSamplerate:(int*)audioSamplerate audioSamplebits:(int*)audioSamplebits inputAudioFormatName:(NSString *)inputAudioFormatName inputAudioDeviceName:(NSString *)inputAudioDeviceName;
+
+/**
+* Open talking with the MVD device via Volc online meeting.
+* Call this function to request the device to create a Volc meeting room and joint the meeting, then return
+* the necessary infomation of the meeting to let the caller join it.
+*
+* Based on the meeting information,  the caller join/leave/monitors the meeting by Volc engine API as a general
+* Volc online meeting application. During the meeting, the audio data is sent/received and played by Volc engine
+* automatically and no other API of this SDK needs to invoke, except mvd_talking_opened() can be called to determine
+* whether the caller is already in a mvd talking.
+*
+* Please follow the below steps to close/leave the meeting:
+*    1) call Volc Engine API to leave the meeting room
+*    2) call mvd_close_talking() to let MVD device peer that you left the talking£¨this is important!
+*
+* @param hDevice           Handle to a connected MVD device which was returned by
+* @param userid            ID/name to identify this user to join the talking in Volc meeting room.
+*                          The length of this userid string must be less than 64!!
+* @param audio_channels    buffer to retrieve the PCM audio channels supported by the device
+* @param audio_samplerate  buffer to retrieve the PCM audio sample rate, namely samples per second
+* @param audio_samplebits  buffer to retrieve then PCM audio sampe bits, namely bits per sample.
+* @param volc_appid        buffer to retrieve the appid of Volc Engine
+* @param volc_roomid       buffer to retrieve the id of meeting room
+* @param volc_token        buffer to retrieve the token for this user to enter Volc meeting room
+
+*
+* @remarks:
+*   1) In Volc talking, these regular talking APIs: mvd_send_audio_frame(), mvd_start_talking(), mvd_start_talking(), mvd_pause_talking() and mvd_get_talking_data_play()
+* are unnecessary to be called and they are not useful for a Volc meetimhg/talking.
+*   2) The Volc Talking, atcually it is a Volc meeting and the device join the meeting with fixed userid 'LINKTD'
+*   3) Only these 2 API are necessary for a Volc talking: mvd_open_volc_talking() and mvd_close_talking(), and
+*   4) These 2 API can be called optionally during the meeting/talking as desired:  mvd_query_talkers() and optional mvd_talking_opened()
+*/
+-(int)mvdOpenVolcTalking:(void*)hDevice userId:(NSString *)userId audioChannels:(int*)audioChannels audioSamplerate:(int*)audioSamplerate audioSamplebits:(int*)audioSamplebits volcAppid:(char*)volcAppid volcRoomid:(char*)volcRoomid volcToken:(char*)volcToken;
+
+/**
+* Let MVD device join the specific Volc RTC meeting room.
+* Call this function to request the device to join a Volc meeting room. If necessary, require the device
+* leave/quit other talking.
+*
+* Based on the meeting information,  the caller join/leave/monitors the meeting by Volc engine API as a general
+* Volc online meeting application. During the meeting, the audio data is sent/received and played by Volc engine
+* automatically and no other API of this SDK needs to invoke, except mvd_talking_opened() can be called to determine
+* whether the caller is already in a mvd talking.
+*
+* Please follow the below steps to close/leave the meeting:
+*    1) call Volc Engine API to leave the meeting room
+*    2) call mvd_close_talking() to let MVD device peer that you left the talking£¨this is important!
+*
+* @param hDevice              Handle to a connected MVD device which was returned by
+* @param volc_roomid          The id of Volc meeting room which was already created!!
+* @param volc_buzid           The ID of Volc businnessID
+* @param close_other_taling   Flag indciating the device to close other talking if it is.  If this flag
+*                             is false, the function will return 0 and the device will be still in the current talking.
+*
+*
+* @remarks:
+*   1) In Volc talking, these regular talking APIs: mvd_send_audio_frame(), mvd_start_talking(), mvd_start_talking(), mvd_pause_talking() and mvd_get_talking_data_play()
+* are unnecessary to be called and they are not useful for a Volc meetimhg/talking.
+*   2) The Volc Talking, atcually it is a Volc meeting and the device join the meeting with fixed userid 'LINKTD'
+*   3) Only these 2 API are necessary for a Volc talking: mvd_join_volc_talking() and mvd_close_talking(), and
+*   4) These 2 API can be called optionally during the meeting/talking as desired:  mvd_query_talkers() and optional mvd_talking_opened()
+*/
+-(int)  mvdJoinVolcTalking:(void*)hDevice roomId:(NSString *)roomId buzId:(NSString *)buzId closeOtherTaling:(bool)closeOtherTaling;
+
+
+/**
+* Query the users who are talking together now via this device.
+*
+* @param hDevice   Handle to a connected MVD device which was returned by
+*                  mvd_create_device().
+* @param userid     Buffer to retrieve all the id of the user who are talking together now via this device.
+*                   It also includes the id of this user himself if he/she are in the device's talking now.
+* @return
+*   >= 0 : the number of user id retrieved in the provided buffer, userid.
+*   <  0 : failed to query
+*/
+- (int)  mvdQueryTalkers:(void*)hDevice userId:(uint32_t[10])userId;
+
+/**
+* send PCM audio frames to the MVD device.
+*
+* @param hDevice   Handle to a connected MVD device which was returned by
+*                  mvd_create_device().
+* @param frame     PCM audio data. The format of the audio data must be consist with the
+*                  channels, smaple rate and sample bits returned by mvd_open_talking(), otherwise
+*                  the device can play the audio data properly.
+* @param len       The length of the frame data in byte
+*
+* @return
+*    true : send in success
+*    false : failed to send
+*
+* @remarks:
+*    This API is provided as an alternative when local audio capture device is not opened for some reason.
+*
+*/
+- (bool)mvdSendAudioFrame:(void*)hDevice tid:(uint64_t)tid frame:(const void**)frame len:(int)len;
+
+/**
+* Get the state to indicate whether the voice tunnel is already opened with the device.
+*
+* @param hDevice   Handle to a connected MVD device which was returned by
+*                  mvd_create_device().
+*
+* @return:
+*    true : already opened
+*    false : not open
+*/
+- (bool)mvdTalkingOpened:(void*)hDevice;
+
+/**
+* close the voice tunnel to stop talking with the MVD device.
+*
+* @param hDevice   Handle to a connected MVD device which was returned by
+*                  mvd_create_device().
+*/
+- (void)mvdCloseTalking:(void*)hDevice;
+
+/**
+* Control to start/resume or pause sending audio data to device.
+*/
+- (void)mvdStartTalking:(void*)hDevice;
+- (void)mvdPauseTalking:(void*)hDevice;
+
+/**
+* ask for talking audio data from device to play.
+* return the length of data copied to the provided buf.
+* The returned audio data is in the format returned by mvd_open_talking().
+*
+* @param hDevice   Handle to a connected MVD device which was returned by
+*                  mvd_create_device().
+* @param buf       buffer to retrieve PCM audio data
+* @param len       the provided buffer size in byte
+*
+* @return:
+*    The length of the audio data copied into the provided buffer.
+*
+* @remarks
+*    This function need to be called immediately when previous audio
+* data gotten by this API was completed playing.
+*
+*/
+- (int)mvdGetTalkingDataPlay:(void*)hDevice buf:(void*)buf len:(int)len;
+
+//////////////////////////////////////////////////////////////////////////////
+//              API for individual playback video stream                    //
+//////////////////////////////////////////////////////////////////////////////
+
+
+/**
+* open a stream to pull the playback video frames from a channel of the MVD device
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param channel   the number of the channel from which to pull video stream
+* @param width      buffer to retrieve the width in pixel of the video stream if
+*                   the function create the stream in success.
+* @param height     buffer to retrieve the height in pixel of the video stream if
+*                   the function create the stream in success.
+* @param fps        buffer to retrieve the framerate of the video stream if
+*                   the function create the stream in success.
+* @param starttime  the starttime from which to pull the playback video stream.
+*                   It is the unix timestamp in second.
+*                   It can be -1 to use the default start time, which is 1 hour back away from now.
+* @param endtime    the endtime to which to stop pulling the playback video stream.
+*                   It is the unix timestamp in second.
+*                   It can be -1 to use the default end time, which is now.
+*
+* @return
+*    The id of the stream if opened in success, otherwise return INVALID_STREAMID on error.
+*
+* @remarks
+*    1) If open in success, can call mvd_get_frame_display() function to get video frame to display.
+*       please refer to mvd_get_frame_display() for details.
+*    2) after opend a playback stream, need to call  mvd_start_playback_stream() to begin to pull video stream.
+*
+*/
+- (uint64_t)mvdOpenPlaybackStream:(void*)hDevice channel:(int)channel width:(int*)width height:(int*)height fps:(float*)fps starttime:(uint32_t)starttime endtime:(uint32_t)endtime;
+
+/**
+* stop/close a playback video stream of a device
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param tid         id of a playback video stream return by mvd_open_playback_stream().
+*
+*
+* @remarks
+*    1) Don't use this id after it closed.
+*    2) Be sure the stream belongs to this device, don't close a stream against
+*       the handle to another device.
+*    3) The stream id MUST BE returned by mvd_open_playback_stream()! Please
+*       don't call this API to close a stream with the id returned by other functions!
+*
+*/
+- (void)mvdClosePlaybackStream:(void*)hDevice tid:(uint64_t)tid;
+
+/**
+* stop/close all playback video stream(s) opened by mvd_open_playback_stream()
+* with the specified device
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+*
+* @remarks
+*    1) This API only close all the playback video streams opned by mvd_open_playback_stream()
+*       for the specified device.
+*    2) after called mvd_clase_all_playback_stream() to close all the video stream,
+*        mvd_open_playback_stream() can be called again to open new stream(s) to play.
+*
+*/
+- (void)mvdCloseAllPlaybackStream:(void*)hDevice;
+
+/**
+* set new starttime and endtime for a plackback stream.
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param tid         id of a playback video stream return by mvd_open_playback_stream().
+* @param starttime  the new start time from which to pull the playback video stream.
+*                   It is the unix timestamp in second.
+* @param endtime    the new end time to which to stop pulling the playback video stream.
+*                   It is the unix timestamp in second.
+*                   It can be -1 to use the default end time, which is now.
+*
+* @return
+*    true for set in sucess, false on error
+*
+* @remarks
+*    the id MUST BE returned by mvd_open_playback_stream() for this specified device
+*
+*/
+- (bool)mvdSetPlaybackStreamNewtime:(void*)hDevice tid:(uint64_t)tid starttime:(uint32_t)starttime endtime:(uint32_t)endtime;
+
+/**
+* set playing speed to play the plackback video stream
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param tid         id of a playback video stream return by mvd_open_playback_stream().
+* @param speedIndex  The index of the speed to playing. This speed index can be from -3 to 3 to
+*                     set the playing speed as (2<<speed_index) times of normal playing speed.
+*                     That is to say£∫
+*                     -speed_index is -3, the speed of playing will be 1/8 of the normal playing speed.
+*                     -speed_index is -2, the speed of playing will be 1/4 of the normal playing speed.
+*                     -speed_index is -1, the speed of playing will be 1/2 of the normal playing speed.
+*                     -speed_index is 0, the speed of playing will be the normal playing speed, namely one time speed.
+*                     -speed_index is 1, the speed of playing will be 2 of the normal playing speed.
+*                     -speed_index is 2, the speed of playing will be 4 of the normal playing speed.
+*                     -speed_index is 3, the speed of playing will be 8 of the normal playing speed.
+*
+* @return
+*    true for set in sucess, false on error
+*
+* @remarks
+*    the id MUST BE returned by mvd_open_playback_stream() for this specified device
+*
+*/
+- (bool)mvdSetPlaybackStreamSpeed:(void*)hDevice tid:(uint64_t)tid sppedIndex:(int)speedIndex;
+
+/**
+* start to pull video data from a playback video stream to play
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param tid         id of a playback video stream return by mvd_open_playback_stream().
+*
+* @return
+*    true for sucess, false on error
+*
+* @remarks
+*    the id MUST BE returned by mvd_open_playback_stream() for this specified device
+*
+*/
+- (bool)mvdStartPlaybackStream:(void*)hDevice tid:(uint64_t)tid;
+
+/**
+* pause to pull video data from a playback video stream to play
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param tid         id of a playback video stream return by mvd_open_playback_stream().
+*
+* @return
+*    true for sucess, false on error
+*
+* @remarks
+*    the id MUST BE returned by mvd_open_playback_stream() for this specified device
+*
+*/
+- (bool)mvdPausePlaybackStream:(void*)hDevice tid:(uint64_t)tid;
+
+/**
+* resume to pull video data from a playback video stream to play
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param tid         id of a playback video stream return by mvd_open_playback_stream().
+*
+* @return
+*    true for sucess, false on error
+*
+* @remarks
+*    the id MUST BE returned by mvd_open_playback_stream() for this specified device
+*
+*/
+- (bool)mvdResumePlaybackStream:(void*)hDevice tid:(uint64_t)tid;
+
+/**
+* get the OSD(on-screen-displayed) time of the playback stream.
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param tid         id of a playback video stream return by mvd_open_playback_stream().
+* @param osdtime    buffer to retrieve the OSD time in unix timestamp in second.
+*
+* @return
+*    true for sucess, false on error
+*
+* @remarks
+*    1) the id MUST BE returned by mvd_open_playback_stream() for this specified device
+*    2) Because this OSD time must be gotten from the real device by communication, please
+*       don't call this function at high frequence. As an alternative, please call mvd_get_playback_stream_playingtime()
+*       to calculate the OSD time for this stream
+*
+*/
+- (bool)mvdGetPlaybackStreamOsdtime:(void*)hDevice tid:(uint64_t)tid osdtime:(uint32_t*)osdtime;
+
+/**
+* get the continous playing time in second after last new starttime set
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param tid         id of a playback video stream return by mvd_open_playback_stream().
+*
+* @return
+*    playtime in second or 0.0 if failed to get
+*
+* @remarks
+*    1) the id MUST BE returned by mvd_open_playback_stream() for this specified device
+*    2) call this function to help to calculate the OSD time with the most starttime
+*       recently set to this stream.
+*
+*/
+- (bool)mvdGetPlaybackStreamPlayingtime:(void*)hDevice tid:(uint64_t)tid;
+
+//////////////////////////////////////////////////////////////////////////////
+//                       API for downloading video data                     //
+//////////////////////////////////////////////////////////////////////////////
+
+/**
+* start a video stream to download from a MVD device with the specified channel
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param filename   pointer to the name of the file to save the downloaded video in mp4 format.
+* @param channel    the channel of the video to download
+* @param starttime  the starttime from which to download.
+*                   It is the unix timestamp in second.
+* @param endtime    the endtime to which to stop  downloading.
+*                   It is the unix timestamp in second.
+* @param bitrate    expected downloading speed in kbps. It can be 0 to let download
+*                   at max speed.  Please provide a suitable speed in the real situation.
+* @param concat     flag indicate to support concatenate the subsequent downloading or not.
+*
+* @return
+*    The id of the stream if started in success, otherwise return INVALID_STREAMID on error.
+*
+* @remarks
+*    1) don't use the returned stream id to call mvd_get_frame_display()!
+*       The returned stream is only for downloading
+*    2) strongly recomment call this function with bitrate > 0 and bitrate <= 16384
+*
+*/
+- (uint64_t)mvdStartDwonloadStream:(void*)hDevice filename:(NSString *)filename channel:(int)channel starttime:(uint32_t)starttime endtime:(uint32_t)endtime bitrate:(int)bitrate concat:(bool)concat;
+
+/**
+* Get the progress of the downloading stream
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param tid         downloading stream id returned by mvd_start_download_stream()
+*
+* @return
+*    [0, 100] : the progress the downloading
+*        <  0 : downloading was broken on error
+*
+* @remarks
+*    1) the stream id must be returned by mvd_start_download_stream()
+*    2) If return 100, means complete the downloading sucessfully and need to call
+*       the mvd_close_download_stream() immediately to close the stream.
+*    3) If return < 0, means an error occurred for the real device and please call
+*       the mvd_close_download_stream() immediately to close the stream.
+*    4) Because this API will ask for real device to get the progress by comminication,
+*       please don't call this API at high freqence, it is recommended for each 3~5 or more seconds to call
+*       this API to get the progress
+*/
+- (int)mvdGetDownloadStreamProgress:(void*)hDevice tid:(uint64_t)tid;
+
+/**
+* close the download stream
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param tid         downloading stream id returned by mvd_start_download_stream()
+*
+*
+*/
+- (void)mvdCloseDownloadStream:(void*)hDevice tid:(uint64_t)tid cancel:(bool)cancel;
+
+/**
+* close all the download stream of the device
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+*
+*/
+- (void)mvdCloseAllDownloadStream:(void*)hDevice;
+
+//////////////////////////////////////////////////////////////////////////////
+//                       Helper API for convenience                         //
+//////////////////////////////////////////////////////////////////////////////
+
+/**
+* refresh the underlying playback group for individual playback stream.
+*
+* When the real MVD device re-started or the allpication lost network connection for a long time,
+* please close all the playback stream returned by mvd_open_playback_stream() and then call
+* this function to reuse mvd_open_playback_stream() to open individual playback stream, or
+* call this function and the call mvd_refresh_display_stream() on all individual playback stream.
+*/
+- (bool)mvdRefreshPlayback:(void*)hDevice;
+
+/**
+* refresh a realtime or playback video stream to display.
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param tid         stream id returned by mvd_open_realplay_stream(), mvd_open_playback_stream()
+*                   or mvd_add_playback_group_stream().
+*/
+- (bool)mvdRefreshDisplayStream:(void*)hDevice tid:(uint64_t)tid;
+
+/**
+* close any type stream opened by mvd_open_realplay_stream(), mvd_open_playback_stream()
+* mvd_add_playback_group_stream(), or mvd_start_download_stream()
+*/
+- (void)mvdCloseStream:(void*)hDevice tid:(uint64_t)tid;
+
+/**
+* Query about the recorded video time segment of the channel of a device
+* between the specified time range.
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param channel    channel to query about.
+* @param fromtime   time range from which to query.  in unix second timestamp
+* @param totime     time range to which to stop query.  in unix second timestamp
+* @param starttime  buffer of an array to retrieve the start time of each segment.  in unix second timestamp
+* @param endtime    buffer of an array to retrieve the end time of each segment.  in unix second timestamp
+* @param hasMore   buffer to retrieve the flag to indicate has more time segment to retrieve for the specified range.
+*
+* @return
+*    >= 0 :  number of retrieved time segment
+*    <  0 :  failed on error
+*/
+- (int)mvdQueryRecordStreamTimeseg:(void*)hDevice channel:(int)channel fromtime:(uint32_t)fromtime totime:(uint32_t)totime starttime:(uint32_t[10])starttime endtime:(uint32_t[10])endtime hasMore:(bool*)hasMore;
+
+
+//////////////////////////////////////////////////////////////////////////////
+//                       API for playback group                             //
+// Playback group is the group of playback video stream(s) of the same      //
+// device to be controlled together convenniently                           //
+//////////////////////////////////////////////////////////////////////////////
+
+
+/**
+* create a playback group for a MVD device.
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+*
+* @return
+*    The handle to the new playbackgroup or NULL if failed to create.
+*
+*
+*/
+
+- (void*) mvdCreatePlaybackGroup:(void*)hDevice;
+
+/**
+* delete a playback group for a MVD device.
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param hGroup     Handle to a playback group which was created by
+*                   mvd_create_playback_group().
+*
+* @remarks
+*    1) The group must belongs to this device!
+*    2) The group cannot be used after it was deleted
+*
+*
+*/
+- (void) mvdDeletePlaybackGroup:(void*)hDevice hGroup:(void*)hGroup;
+
+
+/**
+* open a stream and add to the specified group.
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param hGroup     Handle to a playback group which was created by
+*                   mvd_create_playback_group().
+* @param channel   the number of the channel from which to pull video stream
+* @param width      buffer to retrieve the width in pixel of the video stream if
+*                   the function create the stream in success.
+* @param height     buffer to retrieve the height in pixel of the video stream if
+*                   the function create the stream in success.
+* @param fps        buffer to retrieve the framerate of the video stream if
+*                   the function create the stream in success.
+* @param starttime  the starttime from which to pull the playback video stream.
+*                   It is the unix timestamp in second.
+*                   It can be -1 to use the default start time, which is 1 hour back away from now.
+* @param endtime    the endtime to which to stop pulling the playback video stream.
+*                   It is the unix timestamp in second.
+*                   It can be -1 to use the default end time, which is now.
+*
+* @return
+*    The id of the stream if opened in success, otherwise return INVALID_STREAMID on error.
+*
+* @remarks
+*    1) If open in success, can call mvd_get_frame_display() function to get video frame to display.
+*       please refer to mvd_get_frame_display() for details.
+*    2) after opend a playback stream, need to call  mvd_start_playback_group() to begin to pull video stream.
+*
+*/
+- (uint64_t)mvdAddPlaybackGroupStream:(void*)hDevice hGroup:(void*)hGroup channel:(int)channel width:(int*)width height:(int*)height fps:(float*)fps starttime:(uint32_t)starttime endtime:(uint32_t)endtime;
+/**
+* close a playback video stream and remove it from the group.
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param hGroup     Handle to a playback group which was created by
+*                   mvd_create_playback_group().
+* @param id         id of a playback video stream return by mvd_add_playback_group_stream().
+*
+*
+* @remarks
+*    1) Don't use this id after it closed.
+*    2) Be sure the stream belongs to this group, don't close a stream against
+*       the handle to another group.
+*    3) The stream id MUST BE returned by mvd_add_playback_group_stream()! Please
+*       don't call this API to close a stream with the id returned by other functions!
+*
+*/
+- (void) mvdRemovePlaybackGroupStream:(void*)hDevice hGroup:(void*)hGroup tid:(uint64_t)tid;
+
+/**
+* close all playback video streams and remove them from the group.
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param hGroup     Handle to a playback group which was created by
+*                   mvd_create_playback_group().
+*
+*
+* @remarks
+*    1) This API only close all the playback video streams opened by mvd_add_playback_group_stream()
+*       for the specified group.
+*    2) after called mvd_remove_all_playback_group_stream() to close all the video stream,
+*        mvd_add_playback_group_stream() can be called again to open new stream(s) to play.
+*
+*/
+- (void) mvdRemoveAllPlaybackGroupStream:(void*)hDevice hGroup:(void*)hGroup;
+
+/**
+* set new starttime and endtime for all the playback streams of the plackback group.
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param hGroup     Handle to a playback group which was created by
+*                   mvd_create_playback_group().
+* @param starttime  the new start time from which to pull the playback video streams of this group.
+*                   It is the unix timestamp in second.
+* @param endtime    the new end time to which to stop pulling the playback video streams of this group.
+*                   It is the unix timestamp in second.
+*                   It can be -1 to use the default end time, which is now.
+*
+* @return
+*    true for set in sucess, false on error
+*
+*
+*/
+- (bool) mvdSetPlaybackGroupNewtime:(void*)hDevice hGroup:(void*)hGroup starttime:(uint32_t)starttime endtime:(uint32_t)endtime;
+
+
+/**
+* set playing speed to play the all plackback video stream of the group
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param hGroup     Handle to a playback group which was created by
+*                   mvd_create_playback_group().
+* @param speedIndex  The index of the speed to playing. This speed index can be from -3 to 3 to
+*                     set the playing speed as (2<<speed_index) times of normal playing speed.
+*                     That is to say£∫
+*                     -speedIndex is -3, the speed of playing will be 1/8 of the normal playing speed.
+*                     -speedIndex is -2, the speed of playing will be 1/4 of the normal playing speed.
+*                     -speedIndex is -1, the speed of playing will be 1/2 of the normal playing speed.
+*                     -speedIndex is 0, the speed of playing will be the normal playing speed, namely one time speed.
+*                     -speedIndex is 1, the speed of playing will be 2 of the normal playing speed.
+*                     -speedIndex is 2, the speed of playing will be 4 of the normal playing speed.
+*                     -speedIndex is 3, the speed of playing will be 8 of the normal playing speed.
+*
+* @return
+*    true for set in sucess, false on error
+*/
+- (bool) mvdSetPlaybackGroupSpeed:(void*)hDevice hGroup:(void*)hGroup speedIndex:(int)speedIndex;
+
+
+/**
+* start to pull video data from all playback video streams of the group
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param hGroup     Handle to a playback group which was created by
+*                   mvd_create_playback_group().
+*
+* @return
+*    true for sucess, false on error
+*
+*
+*/
+-(bool) mvdStartPlaybackGroup:(void*)hDevice hGroup:(void*)hGroup;
+
+/**
+* pause to pull video data from all playback video streams of the group
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param hGroup     Handle to a playback group which was created by
+*                   mvd_create_playback_group().
+*
+* @return
+*    true for sucess, false on error
+*
+*
+*/
+-(bool) mvdPausePlaybackGroup:(void*)hDevice hGroup:(void*)hGroup;
+
+/**
+* resume to pull video data from all playback video streams of the group
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param hGroup     Handle to a playback group which was created by
+*                   mvd_create_playback_group().
+*
+* @return
+*    true for sucess, false on error
+*
+*
+*/
+-(bool) mvdResumePlaybackGroup:(void*)hDevice hGroup:(void*)hGroup;
+
+/**
+* get the OSD(on-screen-displayed) time of the playback group.
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param hGroup     Handle to a playback group which was created by
+*                   mvd_create_playback_group().
+* @param osdtime    buffer to retrieve the OSD time in unix timestamp in second.
+*
+* @return
+*    true for sucess, false on error
+*
+* @remarks
+*    1) Because this OSD time must be gotten from the real device by communication, please
+*       don't call this function at high frequence. As an alternative, please call mvd_get_playback_group_playingtime()
+*       to calculate the OSD time for this group
+*    2) If there are more than one playback stream in this group, the API only get the OSD time from any one stream.
+*
+*/
+-(bool) mvdGetOsdtimePlaybackGroup:(void*)hDevice hGroup:(void*)hGroup osdtime:(uint32_t*)osdtime;
+
+/**
+* get the continous playing time in second after last new starttime set
+*
+* @param hDevice    Handle to a connected MVD device which was returned by
+*                   mvd_create_device().
+* @param hGroup     Handle to a playback group which was created by
+*                   mvd_create_playback_group().
+*
+* @return
+*    playtime in second or 0.0 if failed to get
+*
+* @remarks
+*    1) call this function to help to calculate the OSD time with the starttime
+*       most recently set to this stream.
+*    3) If there are more than one playback stream in this group, the API only
+*       get the playing time from any one stream.
+*
+*/
+-(double) mvdGetPlaybackGroupPlayingtime:(void*)hDevice hGroup:(void*)hGroup;
+
+/**
+* refresh a playback group for group playback stream.
+*
+* When the real MVD device re-started or the allpication lost network connection for a long time,
+* please close all the playback group stream returned by mvd_add_playback_group_stream() and then call
+* this function to reuse mvd_add_playback_group_stream() to open group playback stream, or
+* call this function and the call mvd_refresh_display_stream() on all group playback stream.
+*/
+-(bool) mvdRefreshPlaybackGroup:(void*)hDevice hGroup:(void*)hGroup;
+
+//////////////////////////////////////////////////////////////////////////////
 //                         API for E-Touch                                  //
 //////////////////////////////////////////////////////////////////////////////
 
