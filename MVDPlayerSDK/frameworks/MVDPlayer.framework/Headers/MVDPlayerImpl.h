@@ -404,7 +404,7 @@ typedef NS_ENUM(int, EPixelType){
 *    Non-NULL: The hanndle to the device
 *
 */
-- (void*)mvdCreateDevice: (uint32_t)clientid deviceid:(uint32_t)deviceid mqhost:(NSString *)mqhost mqport:(int)mqport mqvhost:(NSString *)mqvhost mquser:(NSString *)mquser mqpassword:(NSString *)mqpassword waterprintfname:(NSString*)waterprintfname waterprintframe:(void*)waterprintframe;
+- (void*)mvdCreateDevice: (uint32_t)clientid deviceid:(uint32_t)deviceid mqhost:(NSString *)mqhost mqport:(int)mqport mqvhost:(NSString *)mqvhost mquser:(NSString *)mquser mqpassword:(NSString *)mqpassword waterprintfname:(NSString*)waterprintfname waterprintframe:(void*)waterprintframe relay:(bool)relay;
 
 /**
 * Destroy a MVD device if no longer need to use it.
